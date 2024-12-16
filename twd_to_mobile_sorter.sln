@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "twd_to_mobile_sorter", "twd_to_mobile_sorter.csproj", "{398F1B59-7A86-468C-8539-11FE67DA75C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{398F1B59-7A86-468C-8539-11FE67DA75C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398F1B59-7A86-468C-8539-11FE67DA75C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398F1B59-7A86-468C-8539-11FE67DA75C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398F1B59-7A86-468C-8539-11FE67DA75C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C8CB78C-25C7-4141-AB2C-83699B0902E2}
+	EndGlobalSection
+EndGlobal
