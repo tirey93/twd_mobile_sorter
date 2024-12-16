@@ -25,8 +25,6 @@ namespace twd_to_pc_sorter.Commands
             var errors = string.Empty;
             if (!File.Exists(_settings.PCPlFileLocation))
                 errors += "Error: PCPlFile was not found in given path\n";
-            if (!File.Exists(_settings.MobilePlFileLocation))
-                errors += "Error: MobilePlFile was not found in given path\n";
             if (!File.Exists(_settings.PCEngFileLocation))
                 errors += "Error: PCEngFile was not found in given path\n";
             if (!File.Exists(_settings.MobileEngFileLocation))
@@ -133,7 +131,7 @@ namespace twd_to_pc_sorter.Commands
                     throw;
                 }
             }
-            File.WriteAllText(_settings.PCPlFileLocation, poResult.ToString());
+            File.WriteAllText(_settings.MobilePlFileLocation, poResult.ToString());
         }
 
         private List<Translation> AddLinesBeforeShift(int shift, int? newShift, Line lineEngMobile)
@@ -157,7 +155,7 @@ namespace twd_to_pc_sorter.Commands
 
         private int? FindInPC(Line mobileLine, int shift, Dictionary<int, Line> dictEngPC)
         {
-            var result = shift - 5;
+            var result = shift - 25;
             for (int i = 0; i < _maxLineNumberPC - mobileLine.Number + shift + 5; i++)
             {
                 result = result + 1;
