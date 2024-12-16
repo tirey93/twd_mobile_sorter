@@ -52,7 +52,7 @@ namespace twd_to_pc_sorter.Commands
             foreach (var lineEngMobile in _linesEngMobile)
             {
                 if(!_dictEngPC.ContainsKey(lineEngMobile.Number + shift))
-                {
+                {   
                     var newShift = FindInPC(lineEngMobile, shift, _dictEngPC);
                     if (newShift != null)
                     {
@@ -94,36 +94,15 @@ namespace twd_to_pc_sorter.Commands
                 });
             }
 
-            var poResult = new StringBuilder();
+            var mobileResult = new StringBuilder();
             foreach (var translation in translations)
             {
                 int number = 0;
                 try
                 {
-                    string[] splittedEng;
-                    string[] splittedPl;
-                    if (translation.PCEngLine != null)
-                    {
-                        splittedEng = translation.PCEngLine.Content.Split('\n');
-                        number = translation.PCEngLine.Number;
-                    }
-                    else
-                    {
-                        splittedEng = translation.MobileEngLine.Content.Split('\n');
-                        number = translation.MobileEngLine.Number;
-                    }
-                    splittedPl = translation.PlLine.Content.Split('\n');
+                    var toAppendMobilePl = $"{translation.PlLine.Number}) {translation.PlLine.Author ?? ""}\n{translation.PlLine.Content}\n";
 
-
-                    int i = 0;
-
-                    foreach (var splittedLine in splittedEng)
-                    {
-                        var markup = SetMarkup(translation, i);
-
-                        poResult.Append(Sort(markup, splittedEng[i], splittedPl[i]));
-                        i = i + 1;
-                    }
+                    mobileResult.Append(toAppendMobilePl);
                 }
                 catch
                 {
@@ -131,7 +110,7 @@ namespace twd_to_pc_sorter.Commands
                     throw;
                 }
             }
-            File.WriteAllText(_settings.MobilePlFileLocation, poResult.ToString());
+            File.WriteAllText(_settings.MobilePlFileLocation, mobileResult.ToString());
         }
 
         private List<Translation> AddLinesBeforeShift(int shift, int? newShift, Line lineEngMobile)
@@ -184,15 +163,6 @@ namespace twd_to_pc_sorter.Commands
                 return $"_{translation.MobileEngLine.Number}_{i}_{translation.MobileEngLine.Author}";
             }
             return string.Empty;
-        }
-
-        private static string Sort(string markup, string engStr, string plStr)
-        {
-            var result = $"msgctxt \"{markup}\"\n";
-            result += $"msgid \"{engStr}\"\n";
-            result += $"msgstr \"{plStr}\"\n\n";
-
-            return result;
         }
     }
 }
