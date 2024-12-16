@@ -23,11 +23,11 @@ namespace twd_to_pc_sorter.Commands
             _settings = options.Value;
 
             var errors = string.Empty;
-            if (!File.Exists(_settings.PCPlDirectory))
+            if (!Directory.Exists(_settings.PCPlDirectory))
                 errors += "Error: PCPlFile was not found in given path\n";
-            if (!File.Exists(_settings.PCEngDirectory))
+            if (!Directory.Exists(_settings.PCEngDirectory))
                 errors += "Error: PCEngFile was not found in given path\n";
-            if (!File.Exists(_settings.MobileEngDirectory))
+            if (!Directory.Exists(_settings.MobileEngDirectory))
                 errors += "Error: MobileEngFile was not found in given path\n";
             if (!string.IsNullOrEmpty(errors))
             {
