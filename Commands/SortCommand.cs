@@ -23,11 +23,11 @@ namespace twd_to_pc_sorter.Commands
             _settings = options.Value;
 
             var errors = string.Empty;
-            if (!File.Exists(_settings.PCPlFileLocation))
+            if (!File.Exists(_settings.PCPlDirectory))
                 errors += "Error: PCPlFile was not found in given path\n";
-            if (!File.Exists(_settings.PCEngFileLocation))
+            if (!File.Exists(_settings.PCEngDirectory))
                 errors += "Error: PCEngFile was not found in given path\n";
-            if (!File.Exists(_settings.MobileEngFileLocation))
+            if (!File.Exists(_settings.MobileEngDirectory))
                 errors += "Error: MobileEngFile was not found in given path\n";
             if (!string.IsNullOrEmpty(errors))
             {
@@ -36,12 +36,12 @@ namespace twd_to_pc_sorter.Commands
                 return;
             }
 
-            _dictEngPC = LineUtils.LoadLines(_settings.PCEngFileLocation)
+            _dictEngPC = LineUtils.LoadLines(_settings.PCEngDirectory)
                 .ToDictionary(x => x.Number, y => y);
             _maxLineNumberPC = _dictEngPC.Keys.Max();
-            _linesEngMobile = LineUtils.LoadLines(_settings.MobileEngFileLocation)
+            _linesEngMobile = LineUtils.LoadLines(_settings.MobileEngDirectory)
                 .OrderBy(x => x.Number).ToList();
-            _dictPl = LineUtils.LoadLines(_settings.PCPlFileLocation)
+            _dictPl = LineUtils.LoadLines(_settings.PCPlDirectory)
                 .ToDictionary(x => x.Number, y => y);
         }
 
@@ -110,7 +110,7 @@ namespace twd_to_pc_sorter.Commands
                     throw;
                 }
             }
-            File.WriteAllText(_settings.MobilePlFileLocation, mobileResult.ToString());
+            File.WriteAllText(_settings.MobilePlDirectory, mobileResult.ToString());
         }
 
         private List<Translation> AddLinesBeforeShift(int shift, int? newShift, Line lineEngMobile)
