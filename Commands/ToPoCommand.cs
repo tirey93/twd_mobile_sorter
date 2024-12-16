@@ -1,18 +1,18 @@
 ﻿
 using Microsoft.Extensions.Options;
 using System.Text;
-using twd_to_mobile_so.Utils;
-using twd_to_mobile_sorter.Dtos;
-using twd_to_mobile_sorter.Settings;
+using twd_to_pc_so.Utils;
+using twd_to_pc_sorter.Dtos;
+using twd_to_pc_sorter.Settings;
 
-namespace twd_to_mobile_sorter.Commands
+namespace twd_to_pc_sorter.Commands
 {
     public class SortCommand
     {
         private readonly MainSettings _settings;
-        private readonly Dictionary<int, Line> _dictEngMobile;
-        private readonly int _maxLineNumberMobile;
-        private readonly List<Line> _linesEngPC;
+        private readonly Dictionary<int, Line> _dictEngPC;
+        private readonly int _maxLineNumberPC;
+        private readonly List<Line> _linesEngMobile;
         private readonly Dictionary<int, Line> _dictPl;
 
         public bool HasErrors { get; set; }
@@ -23,14 +23,14 @@ namespace twd_to_mobile_sorter.Commands
             _settings = options.Value;
 
             var errors = string.Empty;
-            if (!File.Exists(_settings.MobilePlFileLocation))
-                errors += "Error: MobilePlFile was not found in given path\n";
             if (!File.Exists(_settings.PCPlFileLocation))
                 errors += "Error: PCPlFile was not found in given path\n";
-            if (!File.Exists(_settings.MobileEngFileLocation))
-                errors += "Error: MobileEngFile was not found in given path\n";
+            if (!File.Exists(_settings.MobilePlFileLocation))
+                errors += "Error: MobilePlFile was not found in given path\n";
             if (!File.Exists(_settings.PCEngFileLocation))
                 errors += "Error: PCEngFile was not found in given path\n";
+            if (!File.Exists(_settings.MobileEngFileLocation))
+                errors += "Error: MobileEngFile was not found in given path\n";
             if (!string.IsNullOrEmpty(errors))
             {
                 Console.WriteLine(errors);
@@ -38,12 +38,12 @@ namespace twd_to_mobile_sorter.Commands
                 return;
             }
 
-            _dictEngMobile = LineUtils.LoadLines(_settings.MobileEngFileLocation)
+            _dictEngPC = LineUtils.LoadLines(_settings.PCEngFileLocation)
                 .ToDictionary(x => x.Number, y => y);
-            _maxLineNumberMobile = _dictEngMobile.Keys.Max();
-            _linesEngPC = LineUtils.LoadLines(_settings.PCEngFileLocation)
+            _maxLineNumberPC = _dictEngPC.Keys.Max();
+            _linesEngMobile = LineUtils.LoadLines(_settings.MobileEngFileLocation)
                 .OrderBy(x => x.Number).ToList();
-            _dictPl = LineUtils.LoadLines(_settings.MobilePlFileLocation)
+            _dictPl = LineUtils.LoadLines(_settings.PCPlFileLocation)
                 .ToDictionary(x => x.Number, y => y);
         }
 
@@ -51,48 +51,48 @@ namespace twd_to_mobile_sorter.Commands
         {
             var shift = 0;
             var translations = new List<Translation>();
-            foreach (var lineEngPC in _linesEngPC)
+            foreach (var lineEngMobile in _linesEngMobile)
             {
-                if(!_dictEngMobile.ContainsKey(lineEngPC.Number + shift))
+                if(!_dictEngPC.ContainsKey(lineEngMobile.Number + shift))
                 {
-                    var newShift = FindInMobile(lineEngPC, shift, _dictEngMobile);
+                    var newShift = FindInPC(lineEngMobile, shift, _dictEngPC);
                     if (newShift != null)
                     {
-                        translations.AddRange(AddLinesBeforeShift(shift, newShift, lineEngPC));
+                        translations.AddRange(AddLinesBeforeShift(shift, newShift, lineEngMobile));
                         shift = newShift.Value;
                     }
                     else
                     {
                         translations.Add(new Translation
                         {
-                            MobileEngLine = null,
-                            PlLine = lineEngPC,
-                            PCEngLine = lineEngPC
+                            PCEngLine = null,
+                            PlLine = lineEngMobile,
+                            MobileEngLine = lineEngMobile
                         });
                         continue;
                     }
                 }
-                if (lineEngPC.Content != _dictEngMobile[lineEngPC.Number + shift].Content)
+                if (lineEngMobile.Content != _dictEngPC[lineEngMobile.Number + shift].Content)
                 {
-                    var newShift = FindInMobile(lineEngPC, shift, _dictEngMobile);
+                    var newShift = FindInPC(lineEngMobile, shift, _dictEngPC);
                     if (newShift == null)
                     {
                         translations.Add(new Translation
                         {
-                            MobileEngLine = null,
-                            PlLine = lineEngPC,
-                            PCEngLine = lineEngPC
+                            PCEngLine = null,
+                            PlLine = lineEngMobile,
+                            MobileEngLine = lineEngMobile
                         });
                         continue;
                     }
-                    translations.AddRange(AddLinesBeforeShift(shift, newShift, lineEngPC));
+                    translations.AddRange(AddLinesBeforeShift(shift, newShift, lineEngMobile));
                     shift = newShift.Value;
                 }
                 translations.Add(new Translation
                 {
-                    MobileEngLine = _dictEngMobile[lineEngPC.Number + shift],
-                    PlLine = _dictPl[lineEngPC.Number + shift],
-                    PCEngLine = lineEngPC
+                    PCEngLine = _dictEngPC[lineEngMobile.Number + shift],
+                    PlLine = _dictPl[lineEngMobile.Number + shift],
+                    MobileEngLine = lineEngMobile
                 });
             }
 
@@ -104,15 +104,15 @@ namespace twd_to_mobile_sorter.Commands
                 {
                     string[] splittedEng;
                     string[] splittedPl;
-                    if (translation.MobileEngLine != null)
-                    {
-                        splittedEng = translation.MobileEngLine.Content.Split('\n');
-                        number = translation.MobileEngLine.Number;
-                    }
-                    else
+                    if (translation.PCEngLine != null)
                     {
                         splittedEng = translation.PCEngLine.Content.Split('\n');
                         number = translation.PCEngLine.Number;
+                    }
+                    else
+                    {
+                        splittedEng = translation.MobileEngLine.Content.Split('\n');
+                        number = translation.MobileEngLine.Number;
                     }
                     splittedPl = translation.PlLine.Content.Split('\n');
 
@@ -133,37 +133,37 @@ namespace twd_to_mobile_sorter.Commands
                     throw;
                 }
             }
-            File.WriteAllText(_settings.MobilePlFileLocation, poResult.ToString());
+            File.WriteAllText(_settings.PCPlFileLocation, poResult.ToString());
         }
 
-        private List<Translation> AddLinesBeforeShift(int shift, int? newShift, Line lineEngPC)
+        private List<Translation> AddLinesBeforeShift(int shift, int? newShift, Line lineEngMobile)
         {
             var result = new List<Translation>();
             for (int i = 0; i < newShift - shift; i++)
             {
-                if (!_dictEngMobile.ContainsKey(lineEngPC.Number + shift + i))
+                if (!_dictEngPC.ContainsKey(lineEngMobile.Number + shift + i))
                     continue;
 
-                var mobileTranslation = new Translation
+                var pcTranslation = new Translation
                 {
-                    MobileEngLine = _dictEngMobile[lineEngPC.Number + shift + i],
-                    PlLine = _dictPl[lineEngPC.Number + shift + i],
-                    PCEngLine = null
+                    PCEngLine = _dictEngPC[lineEngMobile.Number + shift + i],
+                    PlLine = _dictPl[lineEngMobile.Number + shift + i],
+                    MobileEngLine = null
                 };
-                result.Add(mobileTranslation);
+                result.Add(pcTranslation);
             }
             return result;
         }
 
-        private int? FindInMobile(Line pcLine, int shift, Dictionary<int, Line> dictEngMobile)
+        private int? FindInPC(Line mobileLine, int shift, Dictionary<int, Line> dictEngPC)
         {
             var result = shift - 5;
-            for (int i = 0; i < _maxLineNumberMobile - pcLine.Number + shift + 5; i++)
+            for (int i = 0; i < _maxLineNumberPC - mobileLine.Number + shift + 5; i++)
             {
                 result = result + 1;
-                if (!dictEngMobile.ContainsKey(pcLine.Number + result))
+                if (!dictEngPC.ContainsKey(mobileLine.Number + result))
                     continue;
-                if (dictEngMobile[pcLine.Number + result].Content == pcLine.Content)
+                if (dictEngPC[mobileLine.Number + result].Content == mobileLine.Content)
                 {
                     return result;
                 }
@@ -173,17 +173,17 @@ namespace twd_to_mobile_sorter.Commands
         }
         private static string SetMarkup(Translation translation, int i)
         {
-            if (translation.MobileEngLine != null && translation.PCEngLine != null)
+            if (translation.PCEngLine != null && translation.MobileEngLine != null)
             {
-                return $"{translation.MobileEngLine.Number}_{translation.PCEngLine.Number}_{i}_{translation.MobileEngLine.Author}";
+                return $"{translation.PCEngLine.Number}_{translation.MobileEngLine.Number}_{i}_{translation.PCEngLine.Author}";
             }
-            else if (translation.MobileEngLine != null && translation.PCEngLine == null)
+            else if (translation.PCEngLine != null && translation.MobileEngLine == null)
             {
-                return $"{translation.MobileEngLine.Number}__{i}_{translation.MobileEngLine.Author}";
+                return $"{translation.PCEngLine.Number}__{i}_{translation.PCEngLine.Author}";
             }
-            else if (translation.MobileEngLine == null && translation.PCEngLine != null)
+            else if (translation.PCEngLine == null && translation.MobileEngLine != null)
             {
-                return $"_{translation.PCEngLine.Number}_{i}_{translation.PCEngLine.Author}";
+                return $"_{translation.MobileEngLine.Number}_{i}_{translation.MobileEngLine.Author}";
             }
             return string.Empty;
         }

@@ -1,4 +1,4 @@
-﻿namespace twd_to_mobile_sorter.Dtos
+﻿namespace twd_to_pc_sorter.Dtos
 {
     public class Line
     {

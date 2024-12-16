@@ -77,7 +77,7 @@ StyleCopReport.xml
 *.meta
 *.obj
 *.iobj
-*.pch
+*.mobileh
 *.pdb
 *.ipdb
 *.pgc
@@ -102,7 +102,7 @@ StyleCopReport.xml
 _Chutzpah*
 
 # Visual C++ cache files
-ipch/
+imobileh/
 *.aps
 *.ncb
 *.opendb

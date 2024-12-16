@@ -1,8 +1,8 @@
-﻿using twd_to_mobile_sorter.Dtos;
+﻿using twd_to_pc_sorter.Dtos;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace twd_to_mobile_so  .Utils
+namespace twd_to_pc_so  .Utils
 {
     public class LineUtils
     {
