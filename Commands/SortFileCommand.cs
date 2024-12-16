@@ -14,10 +14,11 @@ namespace twd_to_pc_sorter.Commands
         private List<Line> _linesEngMobile;
         private Dictionary<int, Line> _dictPl;
         private readonly string _mobilePlPath;
+        private readonly int _reverseSearch;
 
         public bool HasErrors { get; set; }
 
-        public SortFileCommand(string pcPlFile, string pcEngFile, string mobileEngFile, string mobilePlPath) 
+        public SortFileCommand(string pcPlFile, string pcEngFile, string mobileEngFile, string mobilePlPath, int reverseSearch) 
         {
             var errors = string.Empty;
             if (!File.Exists(pcPlFile))
@@ -37,7 +38,6 @@ namespace twd_to_pc_sorter.Commands
             {
 
             }
-            //"C://Users/dapyt/Documents/twd_mobile/txt_polski_pc/env_dairybarninterior_escape_english.txt"
             _dictEngPC = LineUtils.LoadLines(pcEngFile)
                 .ToDictionary(x => x.Number, y => y);
             _maxLineNumberPC = _dictEngPC.Keys.Max();
@@ -46,6 +46,7 @@ namespace twd_to_pc_sorter.Commands
             _dictPl = LineUtils.LoadLines(pcPlFile)
                 .ToDictionary(x => x.Number, y => y);
             _mobilePlPath = mobilePlPath;
+            _reverseSearch = reverseSearch;
         }
 
         public void Execute()
@@ -136,8 +137,8 @@ namespace twd_to_pc_sorter.Commands
 
         private int? FindInPC(Line mobileLine, int shift, Dictionary<int, Line> dictEngPC)
         {
-            var result = shift - 25;
-            for (int i = 0; i < _maxLineNumberPC - mobileLine.Number + shift + 5; i++)
+            var result = shift - _reverseSearch;
+            for (int i = 0; i < _maxLineNumberPC - mobileLine.Number + shift + _reverseSearch; i++)
             {
                 result = result + 1;
                 if (!dictEngPC.ContainsKey(mobileLine.Number + result))

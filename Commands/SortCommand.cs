@@ -42,7 +42,8 @@ namespace twd_to_mobile_sorter.Commands
                 var command = new SortFileCommand($"{_settings.PCPlDirectory}/{name}",
                     $"{_settings.PCEngDirectory}/{name}",
                     $"{_settings.MobileEngDirectory}/{name}",
-                    $"{_settings.MobilePlDirectory}/{name}");
+                    $"{_settings.MobilePlDirectory}/{name}",
+                    _settings.ReverseSearch);
                 command.Execute();
             }
         }
